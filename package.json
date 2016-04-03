@@ -1,0 +1,23 @@
+{
+  "name": "adafruit-motor-hat-nodejs-library",
+  "version": "1.0.0",
+  "description": "Unofficial NodeJs library to work with Adafruit Motor HAT",
+  "main": "Adafruit_I2C.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Suhoij/Adafruit-Motor-HAT-NodeJs-Library.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Suhoij/Adafruit-Motor-HAT-NodeJs-Library/issues"
+  },
+  "homepage": "https://github.com/Suhoij/Adafruit-Motor-HAT-NodeJs-Library#readme",
+  "dependencies": {
+    "i2c-bus": "^1.0.2",
+    "sleep": "^3.0.1"
+  }
+}
