@@ -9,6 +9,7 @@ var Adafruit_I2C  = require('./Adafruit_I2C'),
     sleep         = require('sleep');
 
 class PWM {
+
     constructor(address, debug) {
 
         if(address  === undefined) address  = 0x60;
@@ -37,6 +38,47 @@ class PWM {
     }
 
     /**
+     * Sends a software reset (SWRST) command to all the servo drivers on the bus
+     *
+     * @param cls
+     */
+    softwareReset(cls) {
+        cls.general_call_i2c.writeRaw8(0x06);       //SWRST
+    }
+
+
+    /**
+     * Sets the PWM frequency
+     *
+     * @param freq
+     */
+    setPWMFreq(freq) {
+        var prescaleval = 25000000.0;           // 25MHz
+            prescaleval /= 4096.0;              // 12-bit
+            prescaleval /= parseFloat(freq);
+            prescaleval -= 1.0;
+
+        if (this.debug) {
+            console.log("Setting PWM frequency to " + freq + " Hz") ;
+            console.log("Estimated pre-scale: " + prescaleval);
+        }
+
+        var prescale = Math.floor(prescaleval + 0.5);
+
+        if (this.debug) {
+            console.log("Final pre-scale: " + prescale);
+        }
+
+        var oldmode = this.i2c.readU8(PWM.__MODE1);
+        var newmode = (oldmode & 0x7F) | 0x10;              // sleep
+        this.i2c.write8(PWM.__MODE1, newmode);              // go to sleep
+        this.i2c.write8(PWM.__PRESCALE, parseInt(Math.floor(prescale)));
+        this.i2c.write8(PWM.__MODE1, oldmode);
+        sleep.usleep(5000);
+        this.i2c.write8(PWM.__MODE1, oldmode | 0x80);
+    }
+
+    /**
      * Sets a single PWM channel
      *
      * @param channel
@@ -49,7 +91,6 @@ class PWM {
         this.i2c.write8(PWM.__LED0_OFF_L    +4 * channel, off &  0xFF);
         this.i2c.write8(PWM.__LED0_OFF_H    +4 * channel, off >> 8);
     }
-
 
     /**
      * Sets a all PWM channels
@@ -185,4 +226,12 @@ Object.defineProperty(PWM, '__OUTDRV', {
     configurable : false
 });
 
-var pwm = new PWM(undefined, true);
+
+Object.defineProperty(PWM, 'general_call_i2c', {
+    value: new Adafruit_I2C(0x00),
+    writable : false,
+    enumerable : true,
+    configurable : false
+});
+
+module.exports = PWM;

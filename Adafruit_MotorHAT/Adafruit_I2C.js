@@ -70,6 +70,24 @@ class Adafruit_I2C {
     }
 
     /**
+     * Writes an 8-bit value on the bus
+     * @param value
+     * @returns {*}
+     */
+    writeRaw8(value) {
+        try {
+            this.bus.i2cWriteSync(this.address, 8, value);
+            if (this.debug) {
+                console.log("I2C: Wrote " + value) ;
+            }
+        } catch(e) {
+            return this.errMsg() ;
+        }
+    }
+
+
+
+    /**
      * Read an unsigned byte from the I2C device
      *
      * @param reg
